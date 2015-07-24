@@ -7,17 +7,16 @@ Authors: Joel Burton, Christian Fernandez, Meggie Mahnken.
 """
 
 
-from flask import Flask, render_template, redirect, flash, session
+from flask import Flask, render_template, redirect, flash, session, json
 import jinja2
 
 import model
 
 
 app = Flask(__name__)
+app.secret_key = 'this-is-unguessable12'
 
 # Need to use Flask sessioning features
-
-app.secret_key = 'this-is-unguessable12'
 
 # Normally, if you refer to an undefined variable in a Jinja template,
 # Jinja silently ignores this. This makes debugging difficult, so we'll
@@ -63,7 +62,28 @@ def shopping_cart():
     # TODO: Display the contents of the shopping cart.
     #   - The cart is a list in session containing melons added
 
-    return render_template("cart.html")
+    #2.1 
+    melon_ids_in_cart = session.get('cart',[])
+    id2_count = len(melon_ids_in_cart)
+
+    # melon = model.Melon.get_by_id(2)
+    # melon = model.Melon.get_by_id(3)
+
+    #2.2
+    # melon_ids_in_cart_set = set(melon_ids_in_cart)
+    # melon_ids_in_cart_set = [2,3]
+
+    # for item in melon_ids_in_cart_set:
+    #     count = 0
+    #     for melon_id in melon_ids_in_cart:
+    #         if melon_id == item:
+    #             count += 1
+
+
+    #2.3
+
+
+    return render_template("cart.html", id2=id2_count)
 
 
 @app.route("/add_to_cart/<int:id>")
@@ -76,8 +96,14 @@ def add_to_cart(id):
 
     # TODO: Finish shopping cart functionality
     #   - use session variables to hold cart list
+    if 'cart' not in session:
+        session['cart'] = []
 
-    return "Oops! This needs to be implemented!"
+    session['cart'].append(id)
+    print session
+    
+    flash("Successfully added to cart.")
+    return redirect("/cart")
 
 
 @app.route("/login", methods=["GET"])
@@ -99,7 +125,11 @@ def process_login():
     username = request.form.get("username")
     password = request.form.get("password")
 
-    
+    # user_id = authenticate(username, password)
+
+    # if user_id:
+    #     session['user-id'] = user_id
+
     return "Oops! This needs to be implemented"
 
 
